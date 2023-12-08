@@ -1,0 +1,222 @@
+@extends('theme.admin.main')
+
+@section('title')
+Data Foto Ulos
+@endsection
+
+@section('content')
+
+<div class="app-content content ">
+    <div class="content-wrapper container-xxl p-0">
+        <div class="content-body">
+            <div class="row" id="basic-table">
+                <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="card-title">Data Foto Ulos</h1>
+                            <a href="{{ route('galeri.create') }}" class="btn btn-primary align-self-center">Tambah Gambar</a>
+                    </div>
+                    <div class="table-responsive row  justify-content-center m-5">
+                    <div class="col-12">
+                        <table class="table text-center">
+                            <thead>
+                                <tr class="text-center">
+                                    @if(Auth::user()->role=="admin")
+                                    <th>No.</th>
+                                    @endif
+                                    <th>Pembuat</th>
+                                    <th>Nama Ulos</th>
+                                    <th>Foto Ulos</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if(Auth::user()->role=="admin")
+                                @foreach($posts as $index => $item)
+                                <tr>
+                                    <td>{{ $index + $posts ->firstItem() }}</td>
+                                    <td>{{ $item->name }}</td>
+                                    <td>{{ $item ->nama_ulos }}</td>
+                                    <td>
+                                        <img src="{{asset('images/'.$item ->gambar)}}" alt="" style="max-width: 100px"/>
+                                    </td>
+                                    <td>
+                                        @if($item->status==2)
+                                            Ditolak
+                                        @elseif($item->status==false)
+                                            Pending
+                                        @elseif($item->status==true)
+                                            Diterima
+                                        @endif
+                                        {{-- {{$item->status}} --}}
+                                    </td>
+                                    <td class="">
+                                        <div class="d-inline-flex">
+                                            <a class="pe-1 dropdown-toggle hide-arrow text-primary" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical font-small-4">
+                                                    <circle cx="12" cy="12" r="1"></circle>
+                                                    <circle cx="12" cy="5" r="1">
+                                                    </circle><circle cx="12" cy="19" r="1"></circle>
+                                                </svg>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-end" style="">
+                                                @if($item->status==false)
+                                                <form action="{{ route('galeri.apply',$item->id) }}" method="post">
+                                                    @csrf
+                                                    @method("PATCH")
+                                                    <button type="submit" class="dropdown-item">
+                                                    <i data-feather='check'></i>
+                                                      Terima
+                                                  </button>
+                                                </form>
+                                                <form action="{{ route('galeri.reject',$item->id) }}" method="post">
+                                                    @csrf
+                                                    @method("PATCH")
+                                                    <button type="submit" class="dropdown-item">
+                                                    <i data-feather='x'></i>
+                                                      Tolak
+                                                  </button>
+                                                </form>
+                                                @else
+                                                <a href="{{ route('galeri.edit',$item->id) }}" class="dropdown-item">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit font-small-4">
+                                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                    </svg> Edit
+                                                </a>
+                                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{$loop->iteration}}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2 font-small-4 me-50">
+                                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                    </svg>Hapus
+                                                </a>
+                                                @endif
+                                            </div>
+                                          </div>
+                                    </td>
+                                </tr>
+                                <div class="modal fade" id="staticBackdrop{{$loop->iteration}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="staticBackdropLabel{{$loop->iteration}}">Konfirmasi</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                        Apakah Anda ingin menghapusnya?
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-info" data-bs-dismiss="modal">Batal</button>
+                                        <form action="{{ route('galeri.destroy',$item->id) }}" method="post">
+                                            @csrf
+                                            @method("DELETE")
+                                            <button type="submit" class="btn btn-danger">
+                                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2 font-small-4 me-50">
+                                                  <polyline points="3 6 5 6 21 6"></polyline>
+                                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                                              </svg>Hapus
+                                          </button>
+                                          </form>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                                @elseif(Auth::user()->role=="user")
+                                    @foreach($posts as $index => $item)
+                                        @if($item->user_id==Auth::user()->id)
+                                            <tr>
+                                                <td>{{ $item->name }}</td>
+                                                <td>{{ $item ->nama_ulos }}</td>
+                                                <td>
+                                                    <img src="{{asset('images/'.$item ->gambar)}}" alt="" style="max-width: 100px"/>
+                                                </td>
+                                                <td>
+                                                    @if($item->status==true)
+                                                        Diterima
+                                                    @elseif($item->status==false)
+                                                        Pending
+                                                    @elseif($item->status==2)
+                                                        Ditolak
+                                                    @endif
+                                                </td>
+                                                <td class="">
+                                                    <div class="d-inline-flex">
+                                                        <a class="pe-1 dropdown-toggle hide-arrow text-primary" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical font-small-4">
+                                                                <circle cx="12" cy="12" r="1"></circle>
+                                                                <circle cx="12" cy="5" r="1">
+                                                                </circle><circle cx="12" cy="19" r="1"></circle>
+                                                            </svg>
+                                                        </a>
+                                                        <div class="dropdown-menu dropdown-menu-end" style="">
+                                                            <a href="{{ route('galeri.edit',$item->id) }}" class="dropdown-item">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit font-small-4">
+                                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                                </svg> Edit
+                                                            </a>
+                                                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{$loop->iteration}}">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2 font-small-4 me-50">
+                                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                                </svg>Hapus
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <div class="modal fade" id="staticBackdrop{{$loop->iteration}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                    <h5 class="modal-title" id="staticBackdropLabel{{$loop->iteration}}">Konfirmasi</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                    Apakah Anda ingin menghapusnya?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">Batal</button>
+                                                    <form action="{{ route('galeri.destroy',$item->id) }}" method="post">
+                                                        @csrf
+                                                        @method("DELETE")
+                                                        <button type="submit" class="btn btn-danger">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2 font-small-4 me-50">
+                                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                        </svg>Hapus
+                                                    </button>
+                                                    </form>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                
+                                @endif
+                            </tbody>
+                        </table>
+                        @if(Auth::user()->role=="admin")
+                        {{$posts->links()}}
+                        @endif
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@include('sweetalert::alert')
+@endsection
